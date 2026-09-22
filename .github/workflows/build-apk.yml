@@ -39,15 +39,37 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
-      - name: Build APK
+      - name: Build APK - attempt 1
+        id: build1
+        continue-on-error: true
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Wait before retry
+        if: steps.build1.outcome == 'failure'
+        run: sleep 60
+
+      - name: Build APK - attempt 2
+        id: build2
+        continue-on-error: true
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Wait before final retry
+        if: steps.build2.outcome == 'failure'
+        run: sleep 120
+
+      - name: Build APK - final attempt
+        if: steps.build2.outcome == 'failure'
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
