@@ -20,10 +20,10 @@ jobs:
           node-version: 22
 
       - name: Install project dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
 
       - name: Build web application
         run: npm run build
